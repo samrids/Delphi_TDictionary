@@ -10,25 +10,26 @@ uses
 
 type
   TForm2 = class(TForm)
+    btn_Close: TButton;
     Label1: TLabel;
     ListBox1: TListBox;
     RadioGroup1: TRadioGroup;
     ComboBox1: TComboBox;
-    Button1: TButton;
-    procedure FormDestroy(Sender: TObject);
-    procedure Button1Click(Sender: TObject);
+    Label2: TLabel;
+    Label3: TLabel;
+    Label4: TLabel;
+    procedure btn_CloseClick(Sender: TObject);
+    procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure FormCreate(Sender: TObject);
-    procedure ComboBox1Change(Sender: TObject);
-    procedure RadioGroup1Click(Sender: TObject);
     procedure ListBox1Click(Sender: TObject);
+    procedure RadioGroup1Click(Sender: TObject);
+    procedure ComboBox1Change(Sender: TObject);
   private
     { Private declarations }
-    // TIOBE Index for March 2022
     TIOBEMarch2022Programming: TDictionary<Byte, string>;
-    procedure GenDict; // Press control + shift + c
+    procedure GenerateDict;
+    procedure AddDictToControl; // press control + shift +
     function TryGetKey(const Value: string): Byte;
-    procedure AddDictToControls;
-
   public
     { Public declarations }
   end;
@@ -39,74 +40,68 @@ var
 implementation
 
 {$R *.dfm}
-{ TForm2 }
 
-procedure TForm2.AddDictToControls;
+procedure TForm2.AddDictToControl;
 var
   LArray: TArray<Byte>;
-  i: Byte;
   Value: String;
+  i: Byte;
 begin
   ListBox1.Items.Clear;
   RadioGroup1.Items.Clear;
   ComboBox1.Items.Clear;
-  LArray := TIOBEMarch2022Programming.Keys.ToArray;
-  TArray.Sort<Byte>(LArray);
 
-//  for var DictItem in TIOBEMarch2022Programming do
-//  begin
-//     ListBox1.Items.Add(DictItem.Value);
-//     RadioGroup1.Items.Add(DictItem.Value);
-//     ComboBox1.Items.Add(DictItem.Value);
-//  end;
+  LArray := TIOBEMarch2022Programming.Keys.ToArray;    //Sorting key of Dictionary
+  TArray.Sort<Byte>(LArray);
 
   for i in LArray do
   begin
     TIOBEMarch2022Programming.TryGetValue(i, Value);
-
     ListBox1.Items.Add(Value);
     RadioGroup1.Items.Add(Value);
     ComboBox1.Items.Add(Value);
-    // ListBox1.Items.Add(DictItem.Value);
-    // RadioGroup1.Items.Add(DictItem.Value);
-    // ComboBox1.Items.Add(DictItem.Value);
   end;
+
+//  for var DicItem in TIOBEMarch2022Programming do
+//  begin
+//    ListBox1.Items.Add(DicItem.Value);
+//    RadioGroup1.Items.Add(DicItem.Value);
+//    ComboBox1.Items.Add(DicItem.Value);
+//  end;
 
 end;
 
-procedure TForm2.Button1Click(Sender: TObject);
+procedure TForm2.btn_CloseClick(Sender: TObject);
 begin
   Self.Close;
 end;
 
 procedure TForm2.ComboBox1Change(Sender: TObject);
 var
+  Value: string;
   Key: Byte;
-  Value: String;
 begin
-  if TIOBEMarch2022Programming.ContainsValue
-    (ComboBox1.Items[ComboBox1.ItemIndex]) then
-  begin
-    Key := TryGetKey(ComboBox1.Items[ComboBox1.ItemIndex]);
-    TIOBEMarch2022Programming.TryGetValue(Key, Value);
-    Label1.Caption := format('Key = %d, Value = %s', [Key, Value]);
-  end;
+  Key := TryGetKey(ComboBox1.Items[ComboBox1.ItemIndex]);
+  TIOBEMarch2022Programming.TryGetValue(Key, Value);
+  Label1.Caption := format('Key : %d Value: %s', [Key, Value]);
+  ListBox1.ItemIndex := ComboBox1.ItemIndex;
+  RadioGroup1.ItemIndex := ComboBox1.ItemIndex;
 end;
 
-procedure TForm2.FormCreate(Sender: TObject);
-begin
-  GenDict;
-end;
-
-procedure TForm2.FormDestroy(Sender: TObject);
+procedure TForm2.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
   TIOBEMarch2022Programming.free;
 end;
 
-procedure TForm2.GenDict;
+procedure TForm2.FormCreate(Sender: TObject);
 begin
+  GenerateDict;
+end;
+
+procedure TForm2.GenerateDict;
+begin
+  // Create dict value
   TIOBEMarch2022Programming := TDictionary<Byte, string>.Create;
-  //datasource ==> https://www.tiobe.com/tiobe-index/
   TIOBEMarch2022Programming.Add(1, 'Python');
   TIOBEMarch2022Programming.Add(2, 'C');
   TIOBEMarch2022Programming.Add(3, 'Java');
@@ -127,46 +122,42 @@ begin
   TIOBEMarch2022Programming.Add(18, 'Objective-C');
   TIOBEMarch2022Programming.Add(19, 'Perl');
   TIOBEMarch2022Programming.Add(20, 'Lua');
-
-  AddDictToControls;
+  AddDictToControl;
 end;
 
 procedure TForm2.ListBox1Click(Sender: TObject);
 var
+  Value: string;
   Key: Byte;
-  Value: String;
 begin
-  if TIOBEMarch2022Programming.ContainsValue(ListBox1.Items[ListBox1.ItemIndex])
-  then
-  begin
-    Key := TryGetKey(ListBox1.Items[ListBox1.ItemIndex]);
-    TIOBEMarch2022Programming.TryGetValue(Key, Value);
-    Label1.Caption := format('Key = %d, Value = %s', [Key, Value]);
-  end;
+  Key := TryGetKey(ListBox1.Items[ListBox1.ItemIndex]);
+  TIOBEMarch2022Programming.TryGetValue(Key, Value);
+  Label1.Caption := format('Key : %d Value: %s', [Key, Value]);
+  RadioGroup1.ItemIndex := ListBox1.ItemIndex;
+  ComboBox1.ItemIndex := ListBox1.ItemIndex;
 end;
 
 procedure TForm2.RadioGroup1Click(Sender: TObject);
 var
+  Value: string;
   Key: Byte;
-  Value: String;
 begin
-  if TIOBEMarch2022Programming.ContainsValue
-    (RadioGroup1.Items[RadioGroup1.ItemIndex]) then
-  begin
-    Key := TryGetKey(RadioGroup1.Items[RadioGroup1.ItemIndex]);
-    TIOBEMarch2022Programming.TryGetValue(Key, Value);
-    Label1.Caption := format('Key = %d, Value = %s', [Key, Value]);
-  end;
+  Key := TryGetKey(RadioGroup1.Items[RadioGroup1.ItemIndex]);
+  TIOBEMarch2022Programming.TryGetValue(Key, Value);
+  Label1.Caption := format('Key : %d Value: %s', [Key, Value]);
+
+  ListBox1.ItemIndex := RadioGroup1.ItemIndex;
+  ComboBox1.ItemIndex := RadioGroup1.ItemIndex;
 end;
 
 function TForm2.TryGetKey(const Value: string): Byte;
 begin
-  Result := 0;
-  for var Elitem in TIOBEMarch2022Programming do
+  Result := 0; // When find not found
+  for var DictItem in TIOBEMarch2022Programming do
   begin
-    if (Value = Elitem.Value) then
+    if (Value = DictItem.Value) then
     begin
-      Result := Elitem.Key;
+      Result := DictItem.Key;
       Break;
     end;
   end;
